@@ -295,9 +295,9 @@ class hash(Function):
 def hash_layer(input):
     return hash.apply(input)
 
-class Mask_Select(nn.Module):
+class BE_Module(nn.Module):
     def __init__(self):
-        super(Mask_Select, self).__init__()
+        super(BE_Module, self).__init__()
 
     def forward(self, mask, hidden_states):
 
@@ -312,9 +312,9 @@ class Mask_Select(nn.Module):
         return mask_hidden_states
 
 
-class Threshold_Select(nn.Module):
+class ATS_Module(nn.Module):
     def __init__(self):
-        super(Threshold_Select, self).__init__()
+        super(ATS_Module, self).__init__()
         self.threshold = nn.Parameter(torch.tensor(0.0),requires_grad=True)
     def forward(self,x, hidden_states):
         if isinstance(x, list):
@@ -380,12 +380,12 @@ class Encoder(nn.Module):
         num_layers = config.transformer["num_layers"] - 1
         self.encoder_norm = LayerNorm(config.hidden_size, eps=1e-6)
 
-        self.th_select_11 = Threshold_Select()
-        self.th_select_12 = Threshold_Select()
-        self.mask_select = Mask_Select()
+        self.ATS_Module_11 = ATS_Module()
+        self.ATS_Module_12 = ATS_Module()
+        self.BE_Module = BE_Module()
         self.last_layer1 = Block(config)
         self.last_layer2 = Block(config)
-        self.th_layer = Block(config)
+        self.ATS_layer = Block(config)
 
         for _ in range(num_layers):
             layer = Block(config)
@@ -400,9 +400,9 @@ class Encoder(nn.Module):
 
         for layer_block in self.layer:
             if layer_number == 11:
-                th_hidden_states, threshold_loss = self.th_select_11(attn_weights, hidden_states)
+                th_hidden_states, threshold_loss = self.ATS_Module_11(attn_weights, hidden_states)
                 total_threshold_loss += threshold_loss
-                th_hidden_states, th_attn_weights = self.th_layer(th_hidden_states, mask)
+                th_hidden_states, th_attn_weights = self.ATS_layer(th_hidden_states, mask)
 
                 mask_hidden_states,mask_weights = layer_block(hidden_states,mask)
             else:
@@ -410,11 +410,11 @@ class Encoder(nn.Module):
                 attn_weights.append(weights)
             layer_number += 1
 
-        th_hidden_states,threshold_loss = self.th_select_12(th_attn_weights, th_hidden_states)
+        th_hidden_states,threshold_loss = self.ATS_Module_12(th_attn_weights, th_hidden_states)
         total_threshold_loss += threshold_loss
         th_hidden_states, th_attn_weights = self.last_layer1(th_hidden_states, mask)
 
-        mask_hidden_states = self.mask_select(mask,mask_hidden_states)
+        mask_hidden_states = self.BE_Module(mask,mask_hidden_states)
         mask_hidden_states, mask_weights = self.last_layer2(mask_hidden_states,mask)
 
         th_encoded = self.encoder_norm(th_hidden_states)
@@ -530,7 +530,7 @@ class VisionTransformer(nn.Module):
                 if bname.startswith('last') == False:
                     for uname, unit in block.named_children():
                         if layer_idx == 10 and bname.startswith('th') == True:
-                            self.transformer.encoder.th_layer.load_from(weights, n_block=uname)
+                            self.transformer.encoder.ATS_layer.load_from(weights, n_block=uname)
                         elif bname.startswith('th') == False:
                             unit.load_from(weights, n_block=uname)
                         layer_idx += 1
