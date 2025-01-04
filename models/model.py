@@ -344,12 +344,12 @@ class ATS_Module(nn.Module):
 
         attn_scores = top_values / top_values.sum(dim=-1, keepdim=True) # [B,625]
 
-        mask = hash_layer(attn_scores - self.threshold)
-        mask = (mask + 1) / 2
-        mask = torch.round(mask)  
-        mask = mask.unsqueeze(-1)
+        filtered_matrix = hash_layer(attn_scores - self.threshold)
+        filtered_matrix = (filtered_matrix + 1) / 2
+        filtered_matrix = torch.round(filtered_matrix)  
+        filtered_matrix = filtered_matrix.unsqueeze(-1)
 
-        new_noncls_hidden_states = noncls_hidden_states * mask # [B, 626, 768]
+        new_noncls_hidden_states = noncls_hidden_states * filtered_matrix # [B, 626, 768]
         new_noncls_hidden_states = new_noncls_hidden_states.half()
         non_zero_tokens_mask = (new_noncls_hidden_states != 0).any(dim=-1)
         non_zero_token_counts = non_zero_tokens_mask.sum(dim=1)
