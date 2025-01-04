@@ -295,9 +295,9 @@ class hash(Function):
 def hash_layer(input):
     return hash.apply(input)
 
-class Threshold_Select(nn.Module):
+class ATS_Module(nn.Module):
     def __init__(self):
-        super(Threshold_Select, self).__init__()
+        super(ATS_Module, self).__init__()
         self.threshold = nn.Parameter(torch.tensor(0.0),requires_grad=True)
     def forward(self,x, hidden_states):
         if isinstance(x, list):
@@ -326,13 +326,13 @@ class Threshold_Select(nn.Module):
         noncls_hidden_states = torch.stack(parts).squeeze(1)
 
         attn_scores = top_values / top_values.sum(dim=-1, keepdim=True) # [B,625]
+        
+        filtered_matrix = hash_layer(attn_scores - self.threshold)
+        filtered_matrix = (filtered_matrix + 1) / 2
+        filtered_matrix = torch.round(filtered_matrix)  
+        filtered_matrix = filtered_matrix.unsqueeze(-1)
 
-        mask = hash_layer(attn_scores - self.threshold)
-        mask = (mask + 1) / 2
-        mask = torch.round(mask)  
-        mask = mask.unsqueeze(-1)
-
-        new_noncls_hidden_states = noncls_hidden_states * mask # [B, 626, 768]
+        new_noncls_hidden_states = noncls_hidden_states * filtered_matrix # [B, 626, 768]
         new_noncls_hidden_states = new_noncls_hidden_states.half()
         non_zero_tokens_mask = (new_noncls_hidden_states != 0).any(dim=-1)
         non_zero_token_counts = non_zero_tokens_mask.sum(dim=1)
@@ -367,8 +367,8 @@ class Encoder(nn.Module):
         for _ in range(num_layers):
             layer = Block(config)
             self.layer.append(copy.deepcopy(layer))
-        self.th_select_11 = Threshold_Select()
-        self.th_select_12 = Threshold_Select()
+        self.ATS_Module_11 = ATS_Module()
+        self.ATS_Module_12 = ATS_Module()
 
     def forward(self, hidden_states, mask=None):
         attn_weights = []
@@ -380,10 +380,10 @@ class Encoder(nn.Module):
             hidden_states, weights,  = layer_block(hidden_states, mask)
             attn_weights.append(weights)
 
-        new_hidden_states,threshold_loss = self.th_select_11(attn_weights, hidden_states)
+        new_hidden_states,threshold_loss = self.ATS_Module_11(attn_weights, hidden_states)
         total_threshold_loss += threshold_loss
         hidden_states, attn_weights = self.layer[10](new_hidden_states, mask)     
-        new_hidden_states,threshold_loss = self.th_select_12(attn_weights, hidden_states)
+        new_hidden_states,threshold_loss = self.ATS_Module_12(attn_weights, hidden_states)
         total_threshold_loss += threshold_loss
         hidden_states, attn_weights = self.layer[11](new_hidden_states, mask)     
             
