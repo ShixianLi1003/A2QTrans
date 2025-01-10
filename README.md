@@ -45,13 +45,13 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m torch.distributed.launch --nproc_per_nod
  Stanford dogs
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port 12345 train.py --dataset dogs --img_size 400 --train_batch_size 8 --eval_batch_size 4 --learning_rate 0.003 --num_steps 10000 --fp16 --low_memory --eval_every 200 --name sample_run --aplly_BE
+CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port 12345 train.py --dataset dogs --img_size 400 --train_batch_size 4 --eval_batch_size 4 --learning_rate 0.003 --num_steps 10000 --fp16 --low_memory --eval_every 200 --name sample_run --aplly_BE
 ```
 
 NAbirds
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port 12345 train.py --dataset nabirds --img_size 400 --train_batch_size 8 --eval_batch_size 4 --learning_rate 0.02 --num_steps 60000 --fp16 --low_memory --eval_every 200 --name sample_run --aplly_BE
+CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port 12345 train.py --dataset nabirds --img_size 400 --train_batch_size 4 --eval_batch_size 4 --learning_rate 0.02 --num_steps 60000 --fp16 --low_memory --eval_every 200 --name sample_run --aplly_BE
 ```
 
 INat2017
