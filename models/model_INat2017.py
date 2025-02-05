@@ -295,9 +295,9 @@ class hash(Function):
 def hash_layer(input):
     return hash.apply(input)
 
-class ATS_Module(nn.Module):
+class AQS_Module(nn.Module):
     def __init__(self):
-        super(ATS_Module, self).__init__()
+        super(AQS_Module, self).__init__()
         self.threshold = nn.Parameter(torch.tensor(0.0),requires_grad=True)
     def forward(self,x, hidden_states):
         if isinstance(x, list):
@@ -367,8 +367,8 @@ class Encoder(nn.Module):
         for _ in range(num_layers):
             layer = Block(config)
             self.layer.append(copy.deepcopy(layer))
-        self.ATS_Module_11 = ATS_Module()
-        self.ATS_Module_12 = ATS_Module()
+        self.AQS_Module_11 = AQS_Module()
+        self.AQS_Module_12 = AQS_Module()
 
     def forward(self, hidden_states, mask=None):
         attn_weights = []
@@ -380,10 +380,10 @@ class Encoder(nn.Module):
             hidden_states, weights,  = layer_block(hidden_states, mask)
             attn_weights.append(weights)
 
-        new_hidden_states,threshold_loss = self.ATS_Module_11(attn_weights, hidden_states)
+        new_hidden_states,threshold_loss = self.AQS_Module_11(attn_weights, hidden_states)
         total_threshold_loss += threshold_loss
         hidden_states, attn_weights = self.layer[10](new_hidden_states, mask)     
-        new_hidden_states,threshold_loss = self.ATS_Module_12(attn_weights, hidden_states)
+        new_hidden_states,threshold_loss = self.AQS_Module_12(attn_weights, hidden_states)
         total_threshold_loss += threshold_loss
         hidden_states, attn_weights = self.layer[11](new_hidden_states, mask)     
             
