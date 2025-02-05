@@ -312,9 +312,9 @@ class BE_Module(nn.Module):
         return mask_hidden_states
 
 
-class ATS_Module(nn.Module):
+class AQS_Module(nn.Module):
     def __init__(self):
-        super(ATS_Module, self).__init__()
+        super(AQS_Module, self).__init__()
         self.threshold = nn.Parameter(torch.tensor(0.0),requires_grad=True)
     def forward(self,x, hidden_states):
         if isinstance(x, list):
@@ -380,8 +380,8 @@ class Encoder(nn.Module):
         num_layers = config.transformer["num_layers"] - 1
         self.encoder_norm = LayerNorm(config.hidden_size, eps=1e-6)
 
-        self.ATS_Module_11 = ATS_Module()
-        self.ATS_Module_12 = ATS_Module()
+        self.AQS_Module_11 = AQS_Module()
+        self.AQS_Module_12 = AQS_Module()
         self.BE_Module = BE_Module()
         self.last_layer1 = Block(config)
         self.last_layer2 = Block(config)
@@ -400,7 +400,7 @@ class Encoder(nn.Module):
 
         for layer_block in self.layer:
             if layer_number == 11:
-                th_hidden_states, threshold_loss = self.ATS_Module_11(attn_weights, hidden_states)
+                th_hidden_states, threshold_loss = self.AQS_Module_11(attn_weights, hidden_states)
                 total_threshold_loss += threshold_loss
                 th_hidden_states, th_attn_weights = self.ATS_layer(th_hidden_states, mask)
 
@@ -410,7 +410,7 @@ class Encoder(nn.Module):
                 attn_weights.append(weights)
             layer_number += 1
 
-        th_hidden_states,threshold_loss = self.ATS_Module_12(th_attn_weights, th_hidden_states)
+        th_hidden_states,threshold_loss = self.AQS_Module_12(th_attn_weights, th_hidden_states)
         total_threshold_loss += threshold_loss
         th_hidden_states, th_attn_weights = self.last_layer1(th_hidden_states, mask)
 
