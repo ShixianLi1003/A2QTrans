@@ -1,4 +1,4 @@
-# AAQT
+# A<sup>2</sup>QTrans
 
 ## Prerequisites
 
