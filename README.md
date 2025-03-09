@@ -1,4 +1,8 @@
-# Fine-Grained Visual Classification via Adaptive Attention Quantization Transformer
+![p2_v4_00](https://github.com/user-attachments/assets/6b6cae40-b250-44d4-a27d-d2a6c734860a)# Fine-Grained Visual Classification via Adaptive Attention Quantization Transformer
+
+
+## Framework
+![p2_v4_00](https://github.com/user-attachments/assets/2a0b90bc-c7ee-4cfd-a2bc-f7aadd5135e9)
 
 ## Prerequisites
 
