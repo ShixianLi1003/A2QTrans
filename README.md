@@ -66,6 +66,6 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m torch.distributed.launch --nproc_per_nod
 
 ## Acknowledge
 
-Our project references the codes in the following repos. Thanks for thier works and sharing.
+We would like to express our sincere gratitude to the authors of the following repositories for their hard work and generosity in sharing their code, which has been instrumental in the development of our project.
 - [ViT-pytorch](https://github.com/jeonsworld/ViT-pytorch)
 - [TransFG](https://github.com/TACJu/TransFG)
