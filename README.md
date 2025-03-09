@@ -1,4 +1,4 @@
-![p2_v4_00](https://github.com/user-attachments/assets/6b6cae40-b250-44d4-a27d-d2a6c734860a)# Fine-Grained Visual Classification via Adaptive Attention Quantization Transformer
+# Fine-Grained Visual Classification via Adaptive Attention Quantization Transformer
 
 
 ## Framework
