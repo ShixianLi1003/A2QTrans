@@ -1,4 +1,4 @@
-# A<sup>2</sup>QTrans
+# Fine-Grained Visual Classification via Adaptive Attention Quantization Transformer
 
 ## Prerequisites
 
