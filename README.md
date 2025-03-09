@@ -64,3 +64,8 @@ INat2017
 CUDA_VISIBLE_DEVICES=0,1,2,3 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port 12345 train.py --dataset INat2017 --img_size 304 --train_batch_size 16 --eval_batch_size 16 --learning_rate 0.01 --num_steps 271500 --fp16 --low_memory --eval_every 9050 --name sample_run 
 ```
 
+## Acknowledge
+
+Our project references the codes in the following repos. Thanks for thier works and sharing.
+- href{https://github.com/jeonsworld/ViT-pytorch}{ViT-pytorch}
+- https://github.com/TACJu/TransFG
